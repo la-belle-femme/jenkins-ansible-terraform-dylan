@@ -1,0 +1,64 @@
+---
+- name: Playbook to install Docker and deploy SonarQube
+  hosts: all
+  become: yes  # Ensures that the tasks are run with sudo privileges
+  tasks:
+
+    - name: Update the apt package index
+      apt:
+        update_cache: yes
+
+    - name: Install dependencies for Docker (ca-certificates and curl)
+      apt:
+        name: 
+          - ca-certificates
+          - curl
+        state: present
+
+    - name: Create Docker keyring directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker's official GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker repository to Apt sources
+      shell: |
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+      args:
+        warn: false
+
+    - name: Update the apt package index after adding Docker repository
+      apt:
+        update_cache: yes
+
+    - name: Install Docker and its components
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure Docker is started and enabled at boot
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Deploy SonarQube using Docker
+      docker_container:
+        name: sonarqube
+        image: sonarqube:latest
+        state: started
+        ports:
+          - "9000:9000"
+        env:
+          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
