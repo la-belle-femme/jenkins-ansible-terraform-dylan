@@ -2,10 +2,17 @@ pipeline {
     agent any
 
     stages {
+        stage('Cleanup Workspace') {
+            steps {
+                // Ensure the workspace is clean before cloning the repository
+                cleanWs()
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 // Clone the repository
-               sh " git clone https://github.com/la-belle-femme/jenkins-ansible-terraform-dylan.git "
+                sh 'git clone https://github.com/la-belle-femme/jenkins-ansible-terraform-dylan.git'
             }
         }
 
@@ -31,9 +38,10 @@ pipeline {
 
         stage('Clean Workspace') {
             steps {
-                // Clean up the workspace
+                // Clean up the workspace after the job is complete
                 cleanWs()
             }
         }
     }
 }
+
