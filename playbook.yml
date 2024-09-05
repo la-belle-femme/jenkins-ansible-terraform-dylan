@@ -15,6 +15,18 @@
           - curl
         state: present
 
+    - name: Install Python3 and pip3
+      apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+
+    - name: Install Docker SDK for Python (docker-py)
+      pip:
+        name: docker
+        state: present
+
     - name: Create Docker keyring directory
       file:
         path: /etc/apt/keyrings
