@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the repository
-                git 'https://github.com/la-belle-femme/jenkins-ansible-terraform-dylan.git'
+               sh " git clone https://github.com/la-belle-femme/jenkins-ansible-terraform-dylan.git "
             }
         }
 
